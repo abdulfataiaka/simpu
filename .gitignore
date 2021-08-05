@@ -1,0 +1,6 @@
+.vscode/
+.DS_Store
+
+/packages/*
+!/packages/root
+/packages/*/private.Makefile

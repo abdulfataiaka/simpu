@@ -1,0 +1,41 @@
+#!/bin/bash
+
+package=$1
+rootdir=$(dirname $(dirname $0))
+rootpkg=$rootdir/packages/root
+
+if [ "$package" == "" ]; then
+  printf "\nUsage: simpu <package> <command>\n\n"
+  exit
+fi
+
+if [ "$package" == "-" ]; then
+  package=$(basename $(pwd))
+fi
+
+if [ "$package" == "" ] || [ ! -d "$rootdir/packages/$package" ]; then
+  printf "\n[!] No package with the name \`$package\` was found\n\n"
+  exit
+fi
+
+cd $rootdir/packages/$package
+
+# build make command with multiple makefiles
+
+makecmd="make -f $rootpkg/Makefile"
+
+if [ -f "$rootpkg/private.Makefile" ]; then
+  makecmd+=" -f $rootpkg/private.Makefile"
+fi
+
+if [ "$package" != "root" ]; then
+  makecmd+=" -f Makefile"
+
+  if [ -f "private.Makefile" ]; then
+    makecmd+=" -f private.Makefile"
+  fi
+fi
+
+# execute target with built make command
+
+$makecmd ${@:2}
